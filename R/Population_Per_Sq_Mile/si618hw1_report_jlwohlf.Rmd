@@ -1,0 +1,51 @@
+---
+title: "si618hw1_report_jlwohlf"
+author: "John W"
+date: "Tuesday, March 10, 2015"
+output: html_document
+---
+
+Step 1: Load data
+
+First the provided TSV data file is loaded into R using the read.table() function. Here are the first 15 rows
+of the data frame:
+
+```{r, echo=FALSE}
+countrydata_withregion = read.delim("countrydata_withregion.tsv")
+head(countrydata_withregion, n=15)
+```
+
+Step 2: Scatter plot of log transformed data
+
+Natural logarithms of the area and the population of each country are computed and used to produce the
+following scatter plot using the plot() function.
+
+```{r, echo=FALSE}
+plot(log(countrydata_withregion$area), log(countrydata_withregion$population))
+```
+
+Step 3: Data aggregation by region
+
+The areas and populations of all countries in a region are summed up using the aggregate() function,
+respectively. Then the following two pie charts are created using the pie() function.
+
+```{r, echo=FALSE}
+country.areas = aggregate(countrydata_withregion$area, by=list(countrydata_withregion$region), FUN=sum)
+
+country.pop = aggregate(as.numeric(countrydata_withregion$population), by=list(countrydata_withregion$region), FUN=sum, na.rm=TRUE)
+
+pie(country.areas$x, labels=country.areas$Group.1, main="Area of Regions")
+
+pie(country.pop$x, labels=country.pop$Group.1, main="Population of Regions")
+```
+Step 4: Visualization of Population per sq km of Regions
+
+A new data frame is created to contain the population per sq km of each region using the data.frame()
+function. The data frame is then sorted by population per sq km in decreasing order with the help of the
+order() function. Finally, the following bar plot is created using the barplot() function.
+
+```{r, echo=FALSE}
+pop_mile = data.frame(country=country.pop$Group.1, popm=(country.pop$x/country.areas$x))
+mile = pop_mile[order(pop_mile$popm, decreasing = T),]
+barplot(mile$popm, xlab="Population per sq km of Regions",names.arg=mile$country, width=2, cex.axis=1.5, cex.names=.5)
+```
